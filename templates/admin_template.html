@@ -1,0 +1,15 @@
+{% extends "base_template.html" %}
+
+{% block content %}
+    <h2>Admin Panel</h2>
+    
+    <h3>Manage Users</h3>
+    <ul>
+        {% for admin_user in admin_panel.admin_users %}
+            <li>{{ admin_user.username }}</li>
+        {% endfor %}
+    </ul>
+    
+    <!-- Add more admin functionalities as needed -->
+{% endblock %}
+

@@ -1,0 +1,16 @@
+{% extends "base_template.html" %}
+
+{% block content %}
+    <h2>User Profile</h2>
+    
+    <p>Welcome, {{ user.username }}!</p>
+    
+    <h3>Your Tasks:</h3>
+    <ul>
+        {% for task in user.tasks %}
+            <li>{{ task.title }} - Due Date: {{ task.due_date }}</li>
+            <p>{{ task.description }}</p>
+        {% endfor %}
+    </ul>
+{% endblock %}
+
