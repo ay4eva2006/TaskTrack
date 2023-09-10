@@ -1,43 +1,31 @@
-class TaskTracker:
-    def __init__(self):
-        self.tasks = []  # List to store tasks
-        self.users = {}  # Dictionary to store user data (username: password)
-        self.logged_in_user = None  # To keep track of the logged-in user
+from flask_sqlalchemy import SQLAlchemy
 
-    def add_task(self, task_title, task_description, due_date):
-        """Add a new task to the task list."""
-        task = {
-            'title': task_title,
-            'description': task_description,
-            'due_date': due_date,
-            'reminder': None  # Initialize reminder as None
-        }
-        self.tasks.append(task)
+db = SQLAlchemy()
 
-    def delete_task(self, task_index):
-        """Delete a task by its index in the task list."""
-        if 0 <= task_index < len(self.tasks):
-            del self.tasks[task_index]
+class BaseModel(db.Model):
+    __abstract__ = True
+    id = db.Column(db.Integer, primary_key=True)
 
-    def set_reminder(self, task_index, reminder):
-        """Set a reminder for a task by its index in the task list."""
-        if 0 <= task_index < len(self.tasks):
-            self.tasks[task_index]['reminder'] = reminder
+class Task(BaseModel):
+    title = db.Column(db.String(128))
+    description = db.Column(db.String(256))
+    due_date = db.Column(db.Date)
+    reminder = db.Column(db.Date)
+    user = db.Column(db.String(64))  # Store the username of the associated user
 
-    def add_user(self, username, password):
-        """Add a new user to the user dictionary."""
-        if username not in self.users:
-            self.users[username] = password
+class User(BaseModel):
+    username = db.Column(db.String(64), unique=True)
+    password = db.Column(db.String(128))  # Store hashed passwords
 
-    def login(self, username, password):
-        """Log in a user if the username and password match."""
-        if username in self.users and self.users[username] == password:
-            self.logged_in_user = username
-            return True
-        else:
-            return False
+class AdminPanel(BaseModel):
+    admin_users = db.relationship('User', backref='admin_panel', lazy='dynamic')
 
-    def logout(self):
-        """Log out the currently logged-in user."""
-        self.logged_in_user = None
+    def add_admin_user(self, user):
+        self.admin_users.append(user)
+
+    def remove_admin_user(self, user):
+        self.admin_users.remove(user)
+
+    def view_all_users(self):
+        return User.query.all()
 
